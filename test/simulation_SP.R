@@ -28,7 +28,7 @@ Om = eval.penalty(basisobj, Lfdobj=int2Lfd(2), rng=c(1, n))
 s = 1
 sim.iter = 100
 lambda_vec = seq(0, 1, length  = 50)
-for ( s in c(1:sim.iter) ) {
+#for ( s in c(1:sim.iter) ) {
   set.seed(s)
   eps = rgev(n,loc=true_theta[1], scale=true_theta[2], shape=true_theta[3])
   Y = true_beta + eps 
@@ -36,27 +36,17 @@ for ( s in c(1:sim.iter) ) {
   
   eps1 = rgev(n,loc=true_theta[1], scale=true_theta[2], shape=true_theta[3])
   tY = true_beta + eps1
-
-  # est_beta1 = solve(t(Z)%*%Z + n*lambda*Om)%*%t(Z)%*%Y
-  # Y_tilda1 <- Y - Z %*% est_beta1
-  # est_theta1 <- fgev(Y_tilda1)$estimate
-  # result_lm <- c(est_theta1,est_beta1)
-  
-  
   v = rep(0,length(lambda_vec))
   for (j in 1:length(lambda_vec))
   {
     lambda = lambda_vec[j]
-    fit <- try(GEV_regfull(x=Y, z=Z, theta0=true_theta, 
+    fit <- GEV_regfull(x=Y, z=Z, theta0=true_theta, 
                                      beta0=rep(0,p), expr=expr_reg, 
                                      method = 'B-spline',                                   
                                      Om = Om, lambda = lambda, 
-                                     alpha=0.5, maxiter=100)$root, silent = T)
-    m = fit[1] + Z%*%fit[-(1:3)]
-    a = fit[2]
-    k = fit[3]
-    v[j] =  sum(dgev(tY,m,a,k, log = T))
+                                     alpha=1, maxiter=1000)
   }
+  
   plot(m)
   
   plot(v)
