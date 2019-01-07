@@ -1,6 +1,6 @@
 # Finding MLE for nonstationary - fullhessian method
-x=Y; z=Z; theta0=c(100,30,0.1);beta0=rep(0,ncol(Z)); expr=expr_reg; alpha=1; maxiter=1000
-method = 'B-spline' ; lambda = 0
+x=Y; z=Z; theta0=c(100,30,0.1);beta0=rep(0,ncol(Z)); expr=expr_reg; alpha=1e-2; maxiter=10000
+method = 'B-spline' ; lambda = 0.01
 
 n = length(x)
 old_theta <- c(theta0,beta0)
@@ -73,3 +73,7 @@ for (i in 1:maxiter)
     }
   old_theta = new_theta
 }
+
+
+
+plot(Z%*%new_theta[-(1:3)])

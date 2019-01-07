@@ -25,7 +25,7 @@ basisobj = create.bspline.basis(rangeval=c(1, n), nbasis=NULL,
                                 norder=norder, breaks= breaks, dropind=NULL,
                                 quadvals=NULL, values=NULL)
 Om = eval.penalty(basisobj, Lfdobj=int2Lfd(2), rng=c(1, n))
-s = 1
+s = 3
 sim.iter = 100
 lambda_vec = seq(0, 1, length  = 50)
 #for ( s in c(1:sim.iter) ) {
@@ -33,22 +33,25 @@ lambda_vec = seq(0, 1, length  = 50)
   eps = rgev(n,loc=true_theta[1], scale=true_theta[2], shape=true_theta[3])
   Y = true_beta + eps 
   ##### theta, beta MLE
-  
-  eps1 = rgev(n,loc=true_theta[1], scale=true_theta[2], shape=true_theta[3])
-  tY = true_beta + eps1
-  v = rep(0,length(lambda_vec))
-  for (j in 1:length(lambda_vec))
-  {
-    lambda = lambda_vec[j]
+    lambda = 0.01
     fit <- GEV_regfull(x=Y, z=Z, theta0=true_theta, 
                                      beta0=rep(0,p), expr=expr_reg, 
                                      method = 'B-spline',                                   
                                      Om = Om, lambda = lambda, 
-                                     alpha=1, maxiter=1000)
-  }
+                                     alpha=0.1, maxiter=1000)
   
-  plot(m)
+  #fit$
+  plot(Z%*%fit$root[-(1:3)])
   
+  plot(Y)
+  lines(fit$root[1]+Z%*%fit$root[-(1:3)])
+  
+  
+  # 
+  lambda = 10
+  plot(Z%*%solve(t(Z)%*%Z + n*lambda*Om)%*%t(Z)%*%Y)
+  Y
+    
   plot(v)
   lambda = lambda_vec[  which.max(v) ]
   est_beta1 = solve(t(Z)%*%Z + n*lambda*Om)%*%t(Z)%*%Y

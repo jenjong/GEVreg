@@ -142,10 +142,10 @@ GEV_regfull <- function (x, z, theta0, beta0, expr=expr_reg,
     grad = apply(cbind(eval(Jaco),eval(Jaco)[,1]*z),2,mean)
     if (method == 'B-spline' )  
     {
-      grad[-(1:3)] = grad[-(1:3)] + lambda*Om%*%old_theta[-(1:3)]*n
+      grad[-(1:3)] = grad[-(1:3)] + 2*lambda*Om%*%old_theta[-(1:3)]
       grad = grad[-1]
     }
-    if (max(abs(grad))<1e-07){
+    if (max(abs(grad))<1e-4){
       break
     }
 
@@ -154,29 +154,30 @@ GEV_regfull <- function (x, z, theta0, beta0, expr=expr_reg,
     
     if (method == 'B-spline' ) 
     {
-      hess[-(1:3),-(1:3)] = hess[-(1:3),-(1:3)] + lambda*Om*n
-      hess = hess[-1,-1]
-      gd = -solve(hess)%*%grad
-      new_theta[-1] = old_theta[-1] + alpha*gd
-      if (new_theta[3]>0)
-      {
-        # check alpha 
-        if (new_theta[2] < 0 )  stop ("alpha is unstable ")
-        # check mu and kappa 
-        mu.i = new_theta[1] +Z%*%new_theta[-(1:3)]
-        lx = (min(x) <= mu.i - new_theta[2]/new_theta[3])
-        if (any(lx))  stop ("mu and kappa is unstable")
-      }
-      
-      if (new_theta[3]<0)
-      {
-        # check alpha 
-        if (new_theta[2] < 0 )  stop ("alpha is unstable")
-        # check mu and kappa 
-        mu.i = new_theta[1] +Z%*%new_theta[-(1:3)]
-        lx = (max(x) >= mu.i - new_theta[2]/new_theta[3])
-        if (any(lx))  stop ("mu and kappa is unstable")
-      }
+      #new_theta = old_theta - alpha*grad  
+       hess[-(1:3),-(1:3)] = hess[-(1:3),-(1:3)] + 2*lambda*Om*n
+       hess = hess[-1,-1]
+       gd = -solve(hess)%*%grad
+       new_theta[-1] = old_theta[-1] + alpha*gd
+      # if (new_theta[3]>0)
+      # {
+      #   # check alpha 
+      #   if (new_theta[2] < 0 )  stop ("alpha is unstable ")
+      #   # check mu and kappa 
+      #   mu.i = new_theta[1] +Z%*%new_theta[-(1:3)]
+      #   lx = (min(x) <= mu.i - new_theta[2]/new_theta[3])
+      #   if (any(lx))  stop ("mu and kappa is unstable")
+      # }
+      # 
+      # if (new_theta[3]<0)
+      # {
+      #   # check alpha 
+      #   if (new_theta[2] < 0 )  stop ("alpha is unstable")
+      #   # check mu and kappa 
+      #   mu.i = new_theta[1] +Z%*%new_theta[-(1:3)]
+      #   lx = (max(x) >= mu.i - new_theta[2]/new_theta[3])
+      #   if (any(lx))  stop ("mu and kappa is unstable")
+      # }
     }
     
 
@@ -187,8 +188,7 @@ GEV_regfull <- function (x, z, theta0, beta0, expr=expr_reg,
 
     old_theta = new_theta
   }
-  return(list(initial = theta0, root = c(old_theta), step = niter,
-              hess = hess))
+  return(list(initial = theta0, root = c(old_theta), step = niter))
 }
 
 
