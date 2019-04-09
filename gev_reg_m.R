@@ -95,9 +95,11 @@ library(evd)
     
     return( optim(tvec, l2gev_m, lambda = lambda, 
                   method = "BFGS", 
+                  control = optim_controlList,
                   xlist = xlist,
                   zlist = zlist)$par) 
   }
   
- round(gevreg_m(xlist, zlist, lambda = 1),3)
-  
+ fitvec = gevreg_m(xlist, zlist, lambda = 1)
+ matrix(head(fitvec, 3*ns), ns, 3, byrow = T)
+ tail(fitvec,p)
