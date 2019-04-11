@@ -13,7 +13,7 @@ n = 3
 ns = 2
 p = 2
 true_theta = np.array([100,30,0.1], dtype = float)
-true_beta = np.repeat(0,p)
+true_beta = np.repeat(0.0,p)
 xlist = []
 zlist = []
 for i in range(ns):
@@ -29,7 +29,7 @@ for i in range(ns):
 def gevreg_m(xlist, zlist, lambda =0 ):
     p = zlist[1].shape[1]
     ns = len(xlist)
-    tvec = np.repeat(0, ns*3+p)
+    tvec = np.repeat(0.0, ns*3+p)
     
 
     def lgev(x, loc = 0, scale = 1, shape = 0):
@@ -51,8 +51,16 @@ def gevreg_m(xlist, zlist, lambda =0 ):
         return(d)
     
 
+    for i in range(ns):
+        x = xlist[i]
+        start_scale = np.sqrt(6 * np.var(x))/np.pi
+        start_loc = np.mean(x) - 0.58 * start_scale
+        tvec[3*i] = start_loc
+        tvec[3*i+1] = start_scale
+    
+    
         
-    def l2gev_m (tvec, lambda, xlist, zlist):
+    def l2gev_m (tvec, lam, xlist, zlist):
         ns = len(xlist)
         v1 = 0
         for i in range(ns):
@@ -64,7 +72,10 @@ def gevreg_m(xlist, zlist, lambda =0 ):
             sh_vec = tvec[3*i+2]
             v1 = v1 - np.sum(lgev(x, loc = loc_vec, scale = sc_vec,
                            shape = sh_vec))
-        
+        v2 =  lam*np.sum(np.power(tvec[-p:],2))
+        v = v1 + v2
+        return (v)
+    
 
     x = xlist[1]        
     loc = 100
@@ -72,6 +83,7 @@ def gevreg_m(xlist, zlist, lambda =0 ):
     shape = 0.1    
     lgev(xlist[1], loc = 100, scale = 20, shape = 0.1)
     # 
+    lgev(x, loc = 100, scale = 20, shape = 0.1)
     x = np.array([2,3,4,-10, np.nan])
     ~np.isnan(x)
 
