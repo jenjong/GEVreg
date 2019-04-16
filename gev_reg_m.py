@@ -51,16 +51,29 @@ def gevreg_m(xlist, zlist, lambda =0 ):
         return(d)
     
 
+    x = xlist[1]        
+    loc = 100.0
+    scale = 20.0
+    shape = 0.1    
+    lgev(xlist[1], loc = loc, scale = scale, shape = shape)
+    lam = 1.0
+    # 
+
+
+
     for i in range(ns):
         x = xlist[i]
-        start_scale = np.sqrt(6 * np.var(x))/np.pi
+        start_scale = np.sqrt(6.0 * np.var(x))/np.pi
         start_loc = np.mean(x) - 0.58 * start_scale
         tvec[3*i] = start_loc
         tvec[3*i+1] = start_scale
     
     
-        
-    def l2gev_m (tvec, lam, xlist, zlist):
+    args = {'lam': lam, 'xlist': xlist, 'zlist':zlist}
+    
+    
+    def l2gev_m (tvec, args):
+        lam, xlist, zlist = args['lam'], args['xlist'], args['zlist']
         ns = len(xlist)
         v1 = 0
         for i in range(ns):
@@ -76,16 +89,7 @@ def gevreg_m(xlist, zlist, lambda =0 ):
         v = v1 + v2
         return (v)
     
-
-    x = xlist[1]        
-    loc = 100
-    scale = 20
-    shape = 0.1    
-    lgev(xlist[1], loc = 100, scale = 20, shape = 0.1)
-    # 
-    lgev(x, loc = 100, scale = 20, shape = 0.1)
-    x = np.array([2,3,4,-10, np.nan])
-    ~np.isnan(x)
-
-
+    l2gev_m (tvec, args)
+  
+    fit = minimize(l2gev_m, x0 = tvec, method='BFGS',args = args )
 
